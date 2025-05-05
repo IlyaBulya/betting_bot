@@ -8,7 +8,7 @@ from telegram.ext import (
 
 # Настройки
 BOT_TOKEN = os.environ.get("BOT_TOKEN")  # Render использует переменные окружения
-CHANNEL_USERNAME = "@yourchannel"        # 👈 замени на свой @канал
+CHANNEL_USERNAME = "@bettinghumour"        # 👈 замени на свой @канал
 IMAGE_PATH = "Screenshot 2025-05-05 at 16.17.04.png"               # 👈 имя файла прогноза
 FORECAST_TEXT = "🏒 Локо:CЮ ТМ 4.5\n🍁 Торонто Инд Тотал ТБ 2.5\n🇪🇸 Жирона:Мальорка ТМ 2.5\n💰 Коэф: 5.80"
 
