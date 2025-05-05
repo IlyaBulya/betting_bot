@@ -1,45 +1,48 @@
 import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram import (
+    Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
+)
+from telegram.ext import (
+    Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+)
 
-TOKEN = os.environ.get("BOT_TOKEN")
-CHANNEL_USERNAME = "@bettinghumor"  # 👈 твой канал
+# Настройки
+BOT_TOKEN = os.environ.get("BOT_TOKEN")  # Render использует переменные окружения
+CHANNEL_USERNAME = "@yourchannel"        # 👈 замени на свой @канал
+IMAGE_PATH = "Screenshot 2025-05-05 at 16.17.04.png"               # 👈 имя файла прогноза
+FORECAST_TEXT = "🏒 Локо:CЮ ТМ 4.5\n🍁 Торонто Инд Тотал ТБ 2.5\n🇪🇸 Жирона:Мальорка ТМ 2.5\n💰 Коэф: 5.80"
 
-def start(update: Update, context: CallbackContext):
-    keyboard = [
-        [InlineKeyboardButton("🔓 Посмотреть контент", callback_data="check")]
-    ]
-    update.message.reply_text("Привет! Нажми кнопку, чтобы получить доступ к контенту:", reply_markup=InlineKeyboardMarkup(keyboard))
-
-def check_subscription(update: Update, context: CallbackContext):
-    user_id = update.callback_query.from_user.id
-    chat_id = update.effective_chat.id
-
-    try:
-        member = context.bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=user_id)
-        if member.status in ["member", "administrator", "creator"]:
-            context.bot.send_message(chat_id=chat_id, text="✅ Спасибо за подписку! Вот секретный контент:\n\n👉 [Скрытый текст или ссылка]", parse_mode="HTML")
-        else:
-            raise Exception("Not subscribed")
-    except Exception as e:
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="❗ Чтобы получить доступ, подпишитесь на канал:",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔗 Перейти к каналу", url="https://t.me/bettinghumor")]
-            ])
+# Команда /post публикует сообщение в канал с кнопкой
+def post(update: Update, context: CallbackContext):
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔓 Посмотреть прогноз", callback_data="show_forecast")]
+    ])
+    with open(IMAGE_PATH, 'rb') as photo:
+        context.bot.send_photo(
+            chat_id=CHANNEL_USERNAME,
+            photo=photo,
+            caption="🎯 Прогноз дня на 05.05.2025",
+            reply_markup=keyboard
         )
+    update.message.reply_text("✅ Пост опубликован в канал.")
 
+# Обработка нажатия кнопки — alert
+def on_button_click(update: Update, context: CallbackContext):
+    query = update.callback_query
+    if query.data == "show_forecast":
+        query.answer(FORECAST_TEXT, show_alert=True)
+
+# Основной запуск
 def main():
-    print("Бот запущен.")
-    updater = Updater(TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN, use_context=True)
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CallbackQueryHandler(check_subscription, pattern="check"))
+    dp.add_handler(CommandHandler("post", post))
+    dp.add_handler(CallbackQueryHandler(on_button_click))
 
+    print("✅ Бот запущен")
     updater.start_polling()
     updater.idle()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
