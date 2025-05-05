@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Callback
 import os
 
 TOKEN = os.environ.get("BOT_TOKEN")
-CHANNEL_USERNAME = "@yourchannel"  # замените на ваш канал
+CHANNEL_USERNAME = "@bettinghumor"  # замените на ваш канал
 
 def start(update: Update, context: CallbackContext):
     keyboard = [
